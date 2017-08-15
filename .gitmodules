@@ -1,3 +1,3 @@
-[submodule "buildtools"]
+[submodule "userland/buildtools"]
 	path = userland/buildtools
 	url = https://github.com/Steveice10/buildtools.git
