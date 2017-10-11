@@ -41,7 +41,7 @@ int main() {
 	size_t payload_size = ftell(payload);
 	rewind(payload);
 	if(fread(buf + 0x200, 1, payload_size, payload) != payload_size) printf("Failed copy to RAM");
-	memcmp(buf, "A9NC", 4);
+	memcpy(buf, "A9NC", 4);
 	fclose(payload);
 	
 	for(int i=0; i<=120; i++)	for(int i=0; i<=120; i++);
