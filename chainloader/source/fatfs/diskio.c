@@ -76,7 +76,9 @@ DRESULT disk_write (
 	UINT count			/* Number of sectors to write */
 )
 {
-    return RES_PARERR;
+	if (sdmmc_sdcard_writesectors(sector, count, buff))
+		return RES_PARERR;
+	return RES_OK;
 }
 #endif
 

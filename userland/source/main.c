@@ -11,20 +11,16 @@ int main() {
 	gfxInitDefault();
     consoleInit(GFX_BOTTOM, NULL);
 	
-	#ifndef NAME
-	#define NAME "Super Cool Homebrew"
-	#endif
-	#define path_txt "/A9SP/path.txt"
 	#define path_splash "romfs:/splash.bin"
 	#define path_payloadrfs "romfs:/payload.firm"
-	
-	mkdir("/A9SP", 0777);
-	mkdir("/A9SP/payloads", 0777);
+	#define path_chainloader "romfs:/A9SP.firm"
+	#define path_chainloader_sha "romfs:/A9SP.firm.sha"
+	#define path_default "boot0.firm"
+	#define path_bootfirm "boot.firm"
+	#define FIRM_MAXSIZE (0x3FFB00)
 	
 	u8* contents;
-	char path_payloadsd[255];
-
-	snprintf(path_payloadsd, 21+sizeof(NAME), "/A9SP/payloads/%s.firm", NAME);
+	
 	
     FILE *splash = fopen(path_splash, "rb");
 	fseek(splash, 0, SEEK_END);
@@ -38,27 +34,17 @@ int main() {
 	gfxSwapBuffers();
 	gspWaitForVBlank();
 	
+	u8 *buf = (u8*) linearMemAlign(FIRM_MAXSIZE + 0x200, 0x400000);
 	
-	FILE *payloadsd = fopen(path_payloadsd, "r");
-	if(payloadsd == NULL)
-	{
-		printf("Copying payload to %s", path_payloadsd);
-		payloadsd = fopen(path_payloadsd, "w");
-		FILE *payloadrfs = fopen(path_payloadrfs, "r");
-		fseek(payloadrfs, 0, SEEK_END);
-		size_t payloadrfs_size = ftell(payloadrfs);
-		rewind(payloadrfs);
-		contents = malloc(payloadrfs_size);
-		fread(contents, 1, payloadrfs_size, payloadrfs);
-		fwrite(contents, 1, payloadrfs_size, payloadsd);
-		free(contents);
-		fclose(payloadrfs);
-		fclose(payloadsd);
-	}
+	FILE *payload = fopen(path_payloadrfs, "r");
+	fseek(payload, 0, SEEK_END);
+	size_t payload_size = ftell(payload);
+	rewind(payload);
+	if(fread(buf + 0x200, 1, payload_size, payload) != payload_size) printf("Failed copy to RAM");
+	memcmp(buf, "A9NC", 4);
+	fclose(payload);
 	
-	FILE *txt = fopen(path_txt, "w");
-	fprintf(txt, path_payloadsd);
-	fclose(txt);
+	for(int i=0; i<=120; i++)	for(int i=0; i<=120; i++);
 	APT_HardwareResetAsync();
 	
     gfxExit();

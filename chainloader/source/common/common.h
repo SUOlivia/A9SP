@@ -41,9 +41,7 @@
 
 // input / output paths
 #define INPUT_PATH  "0:/"
-#define PATH_PATHTXT	"/A9SP/path.txt"
-#define PATH_DEFAULT    "/A9SP/boot.firm"
-#define PATH_TEMP		"bootonce.firm"
+#define PATH_DEFAULT "boot0.firm"
 
 inline u32 strchrcount(const char* str, char symbol) {
     u32 count = 0;

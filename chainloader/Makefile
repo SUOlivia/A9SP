@@ -18,9 +18,9 @@ include $(DEVKITARM)/ds_rules
 #---------------------------------------------------------------------------------
 export TARGET	:=	A9SP
 BUILD		:=	build
-SOURCES		:=	source source/common source/fatfs
+SOURCES		:=	source source/common source/fatfs source/debug
 DATA		:=	data
-INCLUDES	:=	source source/common source/fatfs
+INCLUDES	:=	source source/common source/fatfs source/debug
 
 #---------------------------------------------------------------------------------
 # options for code generation
@@ -108,7 +108,7 @@ binary: common
 	@make --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile
 
 firm:
-	@firmtool build $(OUTPUT).firm -n 0x23F00000 -e 0 -D $(OUTPUT).bin -A 0x23F00000 -C NDMA -i
+	@firmtool build $(OUTPUT).firm -n 0x23F00000 -e 0 -D $(OUTPUT).bin -A 0x23F00000 -C NDMA -i -g
 	@echo Firm payload built
 #---------------------------------------------------------------------------------
 clean:
