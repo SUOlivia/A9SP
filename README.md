@@ -20,6 +20,6 @@ For those who have GodMode9's bootloader mode installed as Firm0/Firm1, you don'
 
 Credits:
 
-@D0k3 and @Wolfvak for OldLoader and useful help
+[d0k3](https://github.com/d0k3) and [Wolfvak](https://github.com/Wolfvak) for OldLoader and useful help
 
-@MarcuzD for the Makefile
+[MarcuzD](https://github.com/MarcuzD) for the Makefile
