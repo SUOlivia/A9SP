@@ -115,6 +115,8 @@ void main(void)
 	}
 	if(f_size(&firm) > FIRM_MAXSIZE) f_close(&firm);
 	
+	*(vu64*) 0x1FFFE010 = 0;
+	
 	if ((firm_found) && (FirmValid(FIRM_BUFFER, flen))) BootFirm(FIRM_BUFFER);
   
 	
