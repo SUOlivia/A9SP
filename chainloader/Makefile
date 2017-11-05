@@ -108,7 +108,7 @@ binary: common
 	@make --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile
 
 firm:
-	@firmtool build $(OUTPUT).firm -n 0x23F00000 -e 0 -D $(OUTPUT).bin -A 0x23F00000 -C NDMA -i -g
+	@firmtool build $(OUTPUT).firm -D $(OUTPUT).elf -C NDMA -i -g
 	@echo Firm payload built
 #---------------------------------------------------------------------------------
 clean:
@@ -124,18 +124,13 @@ DEPENDS	:=	$(OFILES:.o=.d)
 #---------------------------------------------------------------------------------
 # main targets
 #---------------------------------------------------------------------------------
-$(OUTPUT).bin	:	$(OUTPUT).elf
+$(OUTPUT).firm	:	$(OUTPUT).elf
 $(OUTPUT).elf	:	$(OFILES)
 
 
 #---------------------------------------------------------------------------------
-%.bin: %.elf
-	@$(OBJCOPY) --set-section-flags .bss=alloc,load,contents -O binary $< $@
-	@echo built ... $(notdir $@)
-
 
 -include $(DEPENDS)
-
 
 #---------------------------------------------------------------------------------------
 endif

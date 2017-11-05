@@ -90,6 +90,7 @@ void main(void)
 	FIL firm;
 	FRESULT res;
 	size_t flen, br;
+	char *boot_path = "sdmc:/boot0.firm";
 	bool firm_found = 0;
 
 	if (f_mount(&fs, "0:", 0) != FR_OK) PowerOff();
@@ -101,6 +102,7 @@ void main(void)
 			memmove(FIRM_BUFFER, addr, 0x100000);
 			if (memcmp(addr, "FIRM", 4) == 0) memcpy(addr, "A9NC", 4); // prevent bootloops
 			firm_found = 1;
+			boot_path = 0;
 			flen = 0x100000;
 			break;
 		}
@@ -115,9 +117,9 @@ void main(void)
 	}
 	if(f_size(&firm) > FIRM_MAXSIZE) f_close(&firm);
 	
-	*(vu64*) 0x1FFFE010 = 0;
+	//*(vu64*) 0x1FFFE010 = 0;
 	
-	if ((firm_found) && (FirmValid(FIRM_BUFFER, flen))) BootFirm(FIRM_BUFFER);
+	if ((firm_found) && (FirmValid(FIRM_BUFFER, flen))) BootFirm(FIRM_BUFFER, boot_path);
   
 	
 	while(1);

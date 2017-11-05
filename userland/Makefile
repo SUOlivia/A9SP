@@ -26,18 +26,18 @@ include $(DEVKITARM)/3ds_rules
 #     - icon.png
 #     - <libctru folder>/default_icon.png
 #---------------------------------------------------------------------------------
-TARGET		    :=	$(notdir $(CURDIR))
 BUILD		    :=	build
 SOURCES		    :=	source
 DATA		    :=	data
 INCLUDES	    :=	inc
 ROMFS			:=	romfs
-APP_TITLE       :=  Placeholder
-APP_DESCRIPTION :=  Userland shourcut for $(APP_TITLE)
-APP_AUTHOR      :=  Ordim3n
-APP_PRODUCT_CODE:=  CTR-P-A9SP
-APP_UNIQUE_ID   :=  0xA9000
-ICON            :=  $(CURDIR)/assets/logo.png
+APP_TITLE       :=  GodMode9
+TARGET		    :=	$(APP_TITLE)
+APP_DESCRIPTION :=  Open source 3DS all access file browser
+APP_AUTHOR      :=  d0k3
+APP_PRODUCT_CODE:=  CTR-P-AGM9
+APP_UNIQUE_ID   :=  0xA9001
+ICON            :=  $(TOPDIR)/assets/icon.png
 
 APP_TITLE       :=  $(shell echo "$(APP_TITLE)" | cut -c1-128)
 APP_DESCRIPTION :=  $(shell echo "$(APP_DESCRIPTION)" | cut -c1-256)
@@ -143,7 +143,7 @@ $(BUILD):
 #---------------------------------------------------------------------------------
 clean:
 	@echo clean ...
-	@rm -rf $(BUILD) $(TARGET).3dsx $(OUTPUT).smdh $(TARGET).elf $(TARGET).3ds $(TARGET).cia
+	@rm -rf $(BUILD) $(TARGET).3dsx $(OUTPUT).smdh $(TARGET).elf $(TARGET).3ds $(TARGET).cia assets/banner.bin assets/image.bin
 
 
 #---------------------------------------------------------------------------------
@@ -156,13 +156,12 @@ DEPENDS	:=	$(OFILES:.o=.d)
 #---------------------------------------------------------------------------------
 ifeq ($(strip $(NO_SMDH)),)
 .PHONY: all
-all	:	$(OUTPUT).smdh $(OUTPUT).3dsx $(OUTPUT).cia
+all	:	chainloader $(OUTPUT).smdh $(OUTPUT).3dsx $(OUTPUT).cia
 endif 
 
 $(OUTPUT).smdh	:	
-	@bannertool makesmdh -s "$(APP_TITLE)" -l "$(APP_DESCRIPTION)" -p "$(APP_AUTHOR)" -i $(TOPDIR)/assets/logo.png -o $(OUTPUT).smdh
-
-
+	@bannertool makesmdh -s "$(APP_TITLE)" -l "$(APP_DESCRIPTION)" -p "$(APP_AUTHOR)" -i $(ICON) -o $(OUTPUT).smdh
+	
 $(OUTPUT).3dsx	:	$(OUTPUT).elf
 
 $(OUTPUT).elf	:	$(OFILES)
@@ -170,8 +169,8 @@ $(OUTPUT).elf	:	$(OFILES)
 $(TOPDIR)/assets/banner.bin: $(TOPDIR)/assets/banner.png $(TOPDIR)/assets/banner.wav
 	@bannertool makebanner -i $(TOPDIR)/assets/banner.png -a $(TOPDIR)/assets/banner.wav -o $(TOPDIR)/assets/banner.bin
 
-$(TOPDIR)/assets/image.bin: $(TOPDIR)/assets/logo.png
-	@bannertool makesmdh -s "$(APP_TITLE)" -l "$(APP_DESCRIPTION)" -p "$(APP_AUTHOR)" -i $(TOPDIR)/assets/logo.png -o $(TOPDIR)/assets/image.bin
+$(TOPDIR)/assets/image.bin:
+	@bannertool makesmdh -s "$(APP_TITLE)" -l "$(APP_DESCRIPTION)" -p "$(APP_AUTHOR)" -i $(ICON) -o $(TOPDIR)/assets/image.bin
 
 
 stripped.elf: $(OUTPUT).elf
