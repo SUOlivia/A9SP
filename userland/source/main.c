@@ -46,14 +46,14 @@ int main() {
 		ERRF_ThrowResultWithMessage((Result) 'A9SP', "Read the README next time");
 		errfExit();
 	}
-	u8 *buf = (u8*) linearMemAlign(FIRM_MAXSIZE, 0x400000);
-	memcpy(buf - 0x200, "A9NC", 4);
+	u8 *buf = (u8*) linearMemAlign(FIRM_MAXSIZE + 0x200, 0x400000);
+	memcpy(buf, "A9NC", 4);
 	
 	FILE *payload = fopen(path_payloadrfs, "r");
 	fseek(payload, 0, SEEK_END);
 	size_t payload_size = ftell(payload);
 	rewind(payload);
-	if(fread(buf, 1, payload_size, payload) != payload_size)
+	if(fread(buf + 0x200, 1, payload_size, payload) != payload_size)
 		fixcolor(255, 0, 0);
 	else
 		fixcolor(0, 255, 0);
