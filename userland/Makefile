@@ -143,7 +143,7 @@ $(BUILD):
 #---------------------------------------------------------------------------------
 clean:
 	@echo clean ...
-	@rm -rf $(BUILD) $(TARGET).3dsx $(OUTPUT).smdh $(TARGET).elf $(TARGET).3ds $(TARGET).cia assets/banner.bin assets/image.bin
+	@rm -rf $(BUILD) $(APP_TITLE).* assets/banner.bin assets/image.bin
 
 
 #---------------------------------------------------------------------------------
@@ -156,7 +156,7 @@ DEPENDS	:=	$(OFILES:.o=.d)
 #---------------------------------------------------------------------------------
 ifeq ($(strip $(NO_SMDH)),)
 .PHONY: all
-all	:	chainloader $(OUTPUT).smdh $(OUTPUT).3dsx $(OUTPUT).cia
+all	:	$(OUTPUT).smdh $(OUTPUT).3dsx $(OUTPUT).cia
 endif 
 
 $(OUTPUT).smdh	:	
@@ -181,6 +181,7 @@ stripped.elf: $(OUTPUT).elf
 $(OUTPUT).cia: stripped.elf $(TOPDIR)/assets/banner.bin $(TOPDIR)/assets/image.bin
 	@makerom -f cia -o $(OUTPUT).cia -rsf $(TOPDIR)/assets/cia.rsf -target t -exefslogo -elf stripped.elf -icon $(TOPDIR)/assets/image.bin -banner $(TOPDIR)/assets/banner.bin -DAPP_TITLE="$(APP_TITLE)" -DAPP_PRODUCT_CODE="$(APP_PRODUCT_CODE)" -DAPP_UNIQUE_ID="$(APP_UNIQUE_ID)" -DAPP_ROMFS=$(TOPDIR)/$(ROMFS)
 	@echo "built ... $(notdir $@)"
+	@7z a -mx9 $(TOPDIR)/$(APP_TITLE).7z $(TOPDIR)/$(APP_TITLE).* $(TOPDIR)/../README.md
 
 #---------------------------------------------------------------------------------
 # you need a rule like this for each extension you use as binary data
