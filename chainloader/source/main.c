@@ -3,9 +3,10 @@
 #include "ff.h"
 #include "firm.h"
 #include "sha.h"
+#include "i2c.h"
 
 //for debug purposes only
-//#include "draw.h"
+#include "draw.h"
 
 #define FIRM_BUFFER  ((void*)0x27C00000)
 #define FIRM_MAXSIZE (0x3FFB00)
@@ -84,26 +85,35 @@ bool FirmValid(void *firm, u32 firm_size)
 	return stdFound;
 }
 
+void LED_3D(void)
+{
+	I2C_init();
+	I2C_writeReg(3, 0x2C, 0x0F);
+}
+
 void main(void)
 {
 	FATFS fs;
 	FIL firm;
 	FRESULT res;
 	size_t flen, br;
-	char *boot_path = "sdmc:/boot0.firm";
+	char *boot_path = "sdmc:/"PATH_DEFAULT;
 	bool firm_found = 0;
-
+	
 	if (f_mount(&fs, "0:", 0) != FR_OK) PowerOff();
 	
 	for (u8* addr = (u8*) 0x20000200; addr < (u8*) 0x24000000; addr += 0x400000)
-	{
-		if (FirmValid((FirmHeader*) (void*) addr, 0x100000))
+	{	
+		
+		if (FirmValid((FirmHeader*) (void*) addr, FIRM_MAXSIZE))
 		{
-			memmove(FIRM_BUFFER, addr, 0x100000);
+			memmove(FIRM_BUFFER, addr, FIRM_MAXSIZE);
 			if (memcmp(addr, "FIRM", 4) == 0) memcpy(addr, "A9NC", 4); // prevent bootloops
 			firm_found = 1;
-			boot_path = 0;
-			flen = 0x100000;
+			LED_3D();
+			boot_path = "A9SP";
+			flen = FIRM_MAXSIZE;
+
 			break;
 		}
 	}
@@ -118,9 +128,7 @@ void main(void)
 	if(f_size(&firm) > FIRM_MAXSIZE) f_close(&firm);
 	
 	//*(vu64*) 0x1FFFE010 = 0;
-	
 	if ((firm_found) && (FirmValid(FIRM_BUFFER, flen))) BootFirm(FIRM_BUFFER, boot_path);
-  
 	
 	while(1);
 }

@@ -236,8 +236,9 @@ AccessControlInfo:
    - soc:U
    - ssl:C
    - y2r:u
+   - mcu::HWC
 
-
+   
 SystemControlInfo:
   SaveDataSize: 0KB # Change if the app uses savedata
   RemasterVersion: 2

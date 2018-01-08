@@ -6,6 +6,7 @@
 #include <3ds.h>
 
 #include "LED.h"
+#include "MCU.h"
 	
 #define path_splash "romfs:/splash.bin"
 #define path_payloadrfs "romfs:/payload.firm"
@@ -14,6 +15,23 @@
 #define path_default "boot0.firm"
 #define path_bootfirm "boot.firm"
 #define FIRM_MAXSIZE (0x3FFB00)
+#define FASTBOOT_SLOT (u8)0x06
+
+u8 GetSlot_FastBoot3DS(u8 *out)
+{	
+	mcuInit();
+	mcuReadRegister(0x1E, out, 0x01);
+	mcuExit();
+	return (u32)out;
+}
+
+u8 SetSlot_FastBoot3DS(u8 slot)
+{
+	mcuInit();
+	mcuWriteRegister(0x1E, &slot, 0x01);
+	mcuExit();
+	return slot;
+}
 
 int main() {
     romfsInit();
@@ -22,6 +40,7 @@ int main() {
     consoleInit(GFX_BOTTOM, NULL);
 	
 	u8* contents;
+	u8  slot = 0;
 	
     FILE *splash = fopen(path_splash, "rb");
 	fseek(splash, 0, SEEK_END);
@@ -35,7 +54,7 @@ int main() {
 	gfxSwapBuffers();
 	gspWaitForVBlank();
 	
-	if(!fopen(path_default, "r"))
+	if((!fopen(path_default, "r")) && (GetSlot_FastBoot3DS(&slot) == 0))
 	{
 		printf("%s not found on the root of the SD", path_default);
 		gfxFlushBuffers();
@@ -60,6 +79,15 @@ int main() {
 	
 	fclose(payload);
 	
+	if((GetSlot_FastBoot3DS(&slot) > 0) && (slot != FASTBOOT_SLOT))
+	{
+		//printf("FastBoot3DS slot found, using slot %u, changing to slot %u", slot, FASTBOOT_SLOT);
+		SetSlot_FastBoot3DS(FASTBOOT_SLOT);
+	}
+	else
+	{
+		//printf("Slot change not needed");
+	}
 	for(int i=0; i<=60; i++) gspWaitForVBlank();
 	stfuled();
 	APT_HardwareResetAsync();
