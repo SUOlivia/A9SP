@@ -35,6 +35,10 @@ CFLAGS	+=	$(INCLUDE) -DARM9
 
 CFLAGS	+=	-DBUILD_NAME="\"$(TARGET) (`date +'%Y/%m/%d'`)\""
 
+ifeq ($(DEBUG),1)
+    CFLAGS += -DDEBUG
+endif
+
 CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions
 
 ASFLAGS	:=	-g $(ARCH)

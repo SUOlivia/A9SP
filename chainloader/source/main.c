@@ -42,7 +42,7 @@ bool FirmValid(void *firm, u32 firm_size)
 	bool mpcoreFound, stdFound;
 	u32 firmSizeTotal;
 	u8 sectionHash[0x20];
-
+	
 	hdr = (FirmHeader*)firm;
 	if (firm_size < sizeof(FirmHeader) ||
 		memcmp(hdr->magic, FIRM_MAGIC, 4)) {
@@ -98,7 +98,14 @@ void main(void)
 	FRESULT res;
 	size_t flen, br;
 	char *boot_path = "sdmc:/"PATH_DEFAULT;
-	bool firm_found = 0;
+	bool firm_found = 0, _debug = 0;
+	
+	#ifdef DEBUG
+	_debug = 1;
+	ClearScreenFull(1,1);
+	#endif
+	
+	DrawStringF(0, 0, 0, "_debug = %u", (int) _debug);
 	
 	if (f_mount(&fs, "0:", 0) != FR_OK) PowerOff();
 	
@@ -107,6 +114,7 @@ void main(void)
 		
 		if (FirmValid((FirmHeader*) (void*) addr, FIRM_MAXSIZE))
 		{
+			if(_debug) DrawStringF(0, 0, 1, "Valid payload found at 0x%X in FCRAM", addr);
 			memmove(FIRM_BUFFER, addr, FIRM_MAXSIZE);
 			if (memcmp(addr, "FIRM", 4) == 0) memcpy(addr, "A9NC", 4); // prevent bootloops
 			firm_found = 1;
@@ -115,6 +123,10 @@ void main(void)
 			flen = FIRM_MAXSIZE;
 
 			break;
+		}
+		else
+		{
+			if(_debug) DrawStringF(0, 20, 1, "No payload found in FCRAM, attempting to boot %s instead", boot_path);
 		}
 	}
 	
@@ -128,7 +140,12 @@ void main(void)
 	if(f_size(&firm) > FIRM_MAXSIZE) f_close(&firm);
 	
 	//*(vu64*) 0x1FFFE010 = 0;
+	if((firm_found) && (_debug)) DrawStringF(0, 40, 1, "Booting payload...");
 	if ((firm_found) && (FirmValid(FIRM_BUFFER, flen))) BootFirm(FIRM_BUFFER, boot_path);
+	else
+	{
+		if(_debug) DrawStringF(0, 40, 1, "Booting payload...Failed");
+	}
 	
 	while(1);
 }
