@@ -100,12 +100,11 @@ void main(void)
 	char *boot_path = "sdmc:/"PATH_DEFAULT;
 	bool firm_found = 0, _debug = 0;
 	
+	ClearScreenFull(1,1);
+	
 	#ifdef DEBUG
 	_debug = 1;
-	ClearScreenFull(1,1);
 	#endif
-	
-	DrawStringF(0, 0, 0, "_debug = %u", (int) _debug);
 	
 	if (f_mount(&fs, "0:", 0) != FR_OK) PowerOff();
 	
@@ -121,13 +120,14 @@ void main(void)
 			LED_3D();
 			boot_path = "A9SP";
 			flen = FIRM_MAXSIZE;
-
 			break;
 		}
-		else
-		{
-			if(_debug) DrawStringF(0, 20, 1, "No payload found in FCRAM, attempting to boot %s instead", boot_path);
-		}
+	}
+	
+	if((_debug) && (!firm_found))
+	{
+		DrawStringF(0, 20, 1, "No payload found in FCRAM, attempting to boot");
+		DrawStringF(0, 36, 1, "%s instead", boot_path);
 	}
 	
 	if((!firm_found) && (f_open(&firm, PATH_DEFAULT, FA_READ) == FR_OK) && (f_size(&firm) <= FIRM_MAXSIZE))
@@ -140,11 +140,11 @@ void main(void)
 	if(f_size(&firm) > FIRM_MAXSIZE) f_close(&firm);
 	
 	//*(vu64*) 0x1FFFE010 = 0;
-	if((firm_found) && (_debug)) DrawStringF(0, 40, 1, "Booting payload...");
+	if((firm_found) && (_debug)) DrawStringF(0, 56, 1, "Booting payload...");
 	if ((firm_found) && (FirmValid(FIRM_BUFFER, flen))) BootFirm(FIRM_BUFFER, boot_path);
 	else
 	{
-		if(_debug) DrawStringF(0, 40, 1, "Booting payload...Failed");
+		if(_debug) DrawStringF(0, 56, 1, "Booting payload...Failed");
 	}
 	
 	while(1);
